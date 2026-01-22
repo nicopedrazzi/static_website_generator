@@ -1,9 +1,27 @@
-How to use it:
+# Static Site Generator 
 
-1. Clone the repo
-2. Change the "build.sh" to to your repo name "python3 src/main.py "/REPO NAME/"
-3. Run ./main.sh
-4. Go to github --> pages --> use main and /docs
-5. Push code to github
-6. Wait for deploy...and here you go!
+This repo contains a simple static site generator written in Python. It takes Markdown content from the `content/` directory, combines it with a shared HTML template, copies static assets, and outputs a complete static website.
+
+You can use it to generate your own site by editing the content and running the build scripts.
+
+---
+
+## Features
+
+- Markdown → HTML conversion  
+- Shared HTML template (`template.html`)  
+- Automatic navigation between pages  
+- Static asset copying (`static/` → `docs/`)  
+- GitHub Pages–ready output in `docs/`  
+- Support for a configurable base path (needed for GitHub Pages)  
+
+---
+
+## Requirements
+
+- `python3` (3.9+ recommended)  
+- `git`  
+- A Unix-like shell (macOS/Linux; Windows users can use WSL or Git Bash)  
+
+---
 
