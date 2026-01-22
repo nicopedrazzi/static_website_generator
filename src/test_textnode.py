@@ -308,6 +308,17 @@ class TestTextNode(unittest.TestCase):
             markdown_to_blocks(markdown),
             ["Line 1\nLine 2\nLine 3", "Another 1\nAnother 2"],
         )
+    def test_block_to_block_type_heading(self):
+        block = "### Hello world"
+        self.assertEqual(block_to_block_type(block), BlockType.HEADING)
+
+    def test_block_to_block_type_code_block(self):
+        block = "```\nprint('hi')\n```"
+        self.assertEqual(block_to_block_type(block), BlockType.CODE)
+
+    def test_block_to_block_type_ordered_list_requires_incrementing(self):
+        block = "1. one\n3. three"
+        self.assertEqual(block_to_block_type(block), BlockType.PARAGRAPH)
 
 
 

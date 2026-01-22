@@ -1,9 +1,7 @@
-from warnings import warn
 from textnode import TextType, TextNode
 import re
 from htmlnode import LeafNode 
-##add the function from the other file as it will be more organized to have it here
-#this one can become nested, let's see in the future
+from blocknode import BlockType, BlockNode
 
 def text_node_to_html_node(text_node):
     if text_node.text_type == TextType.PLAIN_TEXT:
@@ -129,3 +127,34 @@ def markdown_to_blocks(markdown):
     return blocks
 
 
+def block_to_block_type(block):
+    lines = block.split("\n")
+
+    if lines[0].startswith("#"):
+        i = 0
+        while i < len(lines[0]) and lines[0][i] == "#":
+            i += 1
+        if 1 <= i <= 6 and i < len(lines[0]) and lines[0][i] == " ":
+            return BlockType.HEADING
+
+    if block.startswith("```\n") and block.endswith("```"):
+        return BlockType.CODE
+
+    if all(line.startswith("> ") for line in lines):
+        return BlockType.QUOTE
+
+    if all(line.startswith("- ") for line in lines):
+        return BlockType.UNORDERED_LIST
+
+    expected = 1
+    for line in lines:
+        if not line.startswith(f"{expected}. "):
+            break
+        expected += 1
+    else:
+        return BlockType.ORDERED_LIST
+
+    return BlockType.PARAGRAPH
+
+def markdown_to_html_node(markdown):
+    
