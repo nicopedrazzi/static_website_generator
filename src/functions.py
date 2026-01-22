@@ -141,7 +141,7 @@ def block_to_block_type(block):
     if block.startswith("```\n") and block.endswith("```"):
         return BlockType.CODE
 
-    if all(line.startswith("> ") for line in lines):
+    if all(line.startswith(">") for line in lines):
         return BlockType.QUOTE
 
     if all(line.startswith("- ") for line in lines):
@@ -199,7 +199,7 @@ def markdown_to_html_node(markdown):
                 dot = line.find(".")
                 item_text = line[dot + 1 :].strip()
                 items.append(ParentNode("li", text_to_children(item_text)))
-            children.append(children("ol", items))
+            children.append(ParentNode("ol", items))
 
         elif btype == BlockType.CODE:
             lines = block.splitlines()
