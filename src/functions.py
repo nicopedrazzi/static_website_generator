@@ -18,7 +18,80 @@ def text_node_to_html_node(text_node):
         return LeafNode(tag="img", value = "", props={"src": text_node.url, "alt": text_node.text})
     else:
         raise Exception("Unknown Type")
-  
+         
+
+def find_delimiter(text):
+    position = []
+    stack = []
+    i=0
+    delimiters = ["*","_"]
+    for char in text:
+        for delim in delimiters:
+            if char == delim:
+                if stack[-1]==delim:
+                    delim += delim
+                    stack.append(delim)
+                else:
+                    stack.append(delim)
+            i +=1
+            position.append(i)
+    return position,stack
+
+
+def parse_inline(text):
+    delimiter_map = {
+        "**": TextType.BOLD,
+        "*": TextType.ITALIC,
+        "_": TextType.ITALIC,
+        "`": TextType.CODE,
+    }
+    ordered_delimiters = sorted(delimiter_map.keys(), key=len, reverse=True)
+    stack = [{"delim": None, "type": None, "children": []}]
+    accumulated_text = []
+    i = 0
+
+    while i < len(text):
+        delim = None
+        if stack[-1]["delim"] == "`":
+            if text.startswith("`", i):
+                delim = "`"
+        else:
+            for token in ordered_delimiters:
+                if text.startswith(token, i):
+                    delim = token
+                    break
+
+        if delim is None:
+            accumulated_text.append(text[i])
+            i += 1
+            continue
+
+        if accumulated_text:
+            stack[-1]["children"].append(
+                TextNode("".join(accumulated_text), TextType.PLAIN_TEXT)
+            )
+            accumulated_text = []
+
+        if stack[-1]["delim"] == delim:
+            frame = stack.pop()
+            node = TextNode("", frame["type"], children=frame["children"])
+            stack[-1]["children"].append(node)
+        else:
+            stack.append(
+                {"delim": delim, "type": delimiter_map[delim], "children": []}
+            )
+
+        i += len(delim)
+
+    if accumulated_text:
+        stack[-1]["children"].append(TextNode("".join(accumulated_text), TextType.PLAIN_TEXT))
+
+    if len(stack) != 1:
+        raise Exception(f"Unmatched delimiter: {stack[-1]['delim']}")
+
+    return stack[0]["children"]
+
+
 
 
 def split_nodes_delimiter(old_nodes, delimiter, text_type):
