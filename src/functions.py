@@ -4,6 +4,19 @@ from htmlnode import LeafNode, HTMLNode, ParentNode
 from blocknode import BlockType
 
 def text_node_to_html_node(text_node):
+    if text_node.children is not None:
+        if text_node.text_type == TextType.BOLD:
+            tag = "b"
+        elif text_node.text_type == TextType.ITALIC:
+            tag = "i"
+        elif text_node.text_type == TextType.CODE:
+            tag = "code"
+        else:
+            raise Exception("Unsupported nested type")
+
+        children = [text_node_to_html_node(child) for child in text_node.children]
+        return ParentNode(tag, children)
+
     if text_node.text_type == TextType.PLAIN_TEXT:
         return LeafNode(tag = None, value = text_node.text)
     elif text_node.text_type == TextType.BOLD:
@@ -19,23 +32,6 @@ def text_node_to_html_node(text_node):
     else:
         raise Exception("Unknown Type")
          
-
-def find_delimiter(text):
-    position = []
-    stack = []
-    i=0
-    delimiters = ["*","_"]
-    for char in text:
-        for delim in delimiters:
-            if char == delim:
-                if stack[-1]==delim:
-                    delim += delim
-                    stack.append(delim)
-                else:
-                    stack.append(delim)
-            i +=1
-            position.append(i)
-    return position,stack
 
 
 def parse_inline(text):
@@ -74,7 +70,14 @@ def parse_inline(text):
 
         if stack[-1]["delim"] == delim:
             frame = stack.pop()
-            node = TextNode("", frame["type"], children=frame["children"])
+            if (
+                len(frame["children"]) == 1
+                and frame["children"][0].text_type == TextType.PLAIN_TEXT
+                and frame["children"][0].children is None
+            ):
+                node = TextNode(frame["children"][0].text, frame["type"])
+            else:
+                node = TextNode("", frame["type"], children=frame["children"])
             stack[-1]["children"].append(node)
         else:
             stack.append(
@@ -184,11 +187,14 @@ def text_to_textnodes(text):
     nodes = split_nodes_images(nodes)
     nodes = split_nodes_links(nodes)
     nodes = split_nodes_delimiter(nodes, "`", TextType.CODE)
-    nodes = split_nodes_delimiter(nodes, "**", TextType.BOLD)
-    nodes = split_nodes_delimiter(nodes, "*", TextType.ITALIC)
-    nodes = split_nodes_delimiter(nodes, "_", TextType.ITALIC)
+    parsed_nodes = []
+    for node in nodes:
+        if node.text_type != TextType.PLAIN_TEXT:
+            parsed_nodes.append(node)
+            continue
+        parsed_nodes.extend(parse_inline(node.text))
 
-    return nodes
+    return parsed_nodes
 
 def markdown_to_blocks(markdown):
     split = markdown.split("\n\n")
