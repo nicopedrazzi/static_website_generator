@@ -1,7 +1,6 @@
 import unittest
 
 from src.textnode import TextNode, TextType
-from src.htmlnode import LeafNode
 from src.functions import *
 
 

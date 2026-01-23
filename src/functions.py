@@ -1,7 +1,7 @@
-from textnode import TextType, TextNode
+from src.textnode import TextType, TextNode
 import re
-from htmlnode import LeafNode, HTMLNode, ParentNode
-from blocknode import BlockType
+from src.htmlnode import LeafNode, HTMLNode, ParentNode
+from src.blocknode import BlockType
 
 def text_node_to_html_node(text_node):
     if text_node.children is not None:

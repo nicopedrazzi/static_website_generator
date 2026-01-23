@@ -1,9 +1,9 @@
-from textnode import TextNode, TextType
+from src.textnode import TextNode, TextType
 import logging
 import os
 import shutil
 import sys
-from functions import *
+from src.functions import *
 
 def extract_title(markdown):
     for line in markdown.splitlines():
