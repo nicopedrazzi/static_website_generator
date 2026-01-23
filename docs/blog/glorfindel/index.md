@@ -30,7 +30,7 @@ Mix **bold** and _italic_. Nested emphasis also works (for example: **bold with 
 
 ## Code
 
-```python
+```
 def hello(name):
     return f"Hello, {name}!"
 ```

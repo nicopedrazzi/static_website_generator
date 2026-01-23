@@ -50,23 +50,24 @@ def generate_pages_recursive(dir_path_content, template_path, dest_dir_path, bas
             dest_html_path = os.path.splitext(dest_path)[0] + ".html"
             generate_page(entry_path, template_path, dest_html_path, basepath)
 
-def from_source_to_dest(source_path, dest_path):
+def from_source_to_dest(source_path, dest_path, preserve_existing=False):
     if not os.path.exists(dest_path):
         os.makedirs(dest_path)
 
-    for entry in os.listdir(dest_path):
-        entry_path = os.path.join(dest_path, entry)
-        if os.path.isdir(entry_path):
-            shutil.rmtree(entry_path)
-        else:
-            os.remove(entry_path)
+    if not preserve_existing:
+        for entry in os.listdir(dest_path):
+            entry_path = os.path.join(dest_path, entry)
+            if os.path.isdir(entry_path):
+                shutil.rmtree(entry_path)
+            else:
+                os.remove(entry_path)
 
     for entry in os.listdir(source_path):
         source_entry = os.path.join(source_path, entry)
         dest_entry = os.path.join(dest_path, entry)
         if os.path.isdir(source_entry):
             logging.info("Copying directory %s -> %s", source_entry, dest_entry)
-            shutil.copytree(source_entry, dest_entry)
+            shutil.copytree(source_entry, dest_entry, dirs_exist_ok=True)
         else:
             logging.info("Copying file %s -> %s", source_entry, dest_entry)
             shutil.copy2(source_entry, dest_entry)
@@ -74,8 +75,10 @@ def from_source_to_dest(source_path, dest_path):
 def main():
     logging.basicConfig(level=logging.INFO, format="%(message)s")
     basepath = sys.argv[1] if len(sys.argv) > 1 else "/"
-    from_source_to_dest("static/", "docs/")
-    generate_pages_recursive("content", "template.html", "docs", basepath)
+    content_root = "docs"
+    output_root = "docs"
+    from_source_to_dest("static/", output_root, preserve_existing=True)
+    generate_pages_recursive(content_root, "template.html", output_root, basepath)
 
 if __name__ == "__main__":
     main()

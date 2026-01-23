@@ -35,20 +35,19 @@ Use **bold**, _italic_, and `inline code`.
 
 ## Code blocks
 
-```python
+```
 print("Hello from a code block")
 ```
 
+Note: this generator does not support blank lines inside fenced code blocks.
+
 ## Starter template
 
-```md
+```
 # Page Title
-
 Intro paragraph with **bold** and _italic_ text.
-
 - Bullet
 - Bullet
-
 [Link text](https://example.com)
 ```
 
